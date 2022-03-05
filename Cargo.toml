@@ -21,7 +21,7 @@ repository = "https://github.com/crohlfs/rv3029-rs"
 version = "0.1.0"
 
 [dependencies]
-embedded-hal = "0.2.7"
+embedded-hal = "1.0.0-alpha.7"
 rtcc = "0.3"
 
 [dev-dependencies]

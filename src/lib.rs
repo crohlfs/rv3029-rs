@@ -142,7 +142,7 @@
 #![deny(missing_docs)]
 #![no_std]
 
-use embedded_hal::blocking::i2c::{Write, WriteRead};
+use embedded_hal::i2c::blocking::I2c;
 
 /// All possible errors in this crate
 #[derive(Debug)]
@@ -172,9 +172,9 @@ mod run;
 mod register_access;
 use crate::register_access::{BitFlags, Register, ADDR};
 
-impl<I2C, E> Rv3029<I2C>
+impl<I2C> Rv3029<I2C>
 where
-    I2C: Write<Error = E> + WriteRead<Error = E>,
+    I2C: I2c,
 {
     /// Create a new instance.
     pub fn new(i2c: I2C) -> Self {

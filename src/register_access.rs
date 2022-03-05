@@ -1,5 +1,5 @@
 use crate::{Error, Rv3029};
-use embedded_hal::blocking::i2c::{Write, WriteRead};
+use embedded_hal::i2c::blocking::I2c;
 
 pub struct Register;
 impl Register {
@@ -28,17 +28,17 @@ impl BitFlags {
     // pub const OUTRATERS1: u8 = 0b0000_0010;
 }
 
-pub const ADDR: u8 = 0b110_1000;
+pub const ADDR: u8 = 0xac;
 
-impl<I2C, E> Rv3029<I2C>
+impl<I2C> Rv3029<I2C>
 where
-    I2C: Write<Error = E> + WriteRead<Error = E>,
+    I2C: I2c,
 {
     pub(crate) fn register_bit_flag_high(
         &mut self,
         address: u8,
         bitmask: u8,
-    ) -> Result<bool, Error<E>> {
+    ) -> Result<bool, Error<I2C::Error>> {
         let data = self.read_register(address)?;
         Ok((data & bitmask) != 0)
     }
@@ -47,7 +47,7 @@ where
         &mut self,
         address: u8,
         bitmask: u8,
-    ) -> Result<(), Error<E>> {
+    ) -> Result<(), Error<I2C::Error>> {
         let data = self.read_register(address)?;
         if (data & bitmask) == 0 {
             self.write_register(address, data | bitmask)
@@ -60,7 +60,7 @@ where
         &mut self,
         address: u8,
         bitmask: u8,
-    ) -> Result<(), Error<E>> {
+    ) -> Result<(), Error<I2C::Error>> {
         let data = self.read_register(address)?;
         if (data & bitmask) != 0 {
             self.write_register(address, data & !bitmask)
@@ -69,12 +69,16 @@ where
         }
     }
 
-    pub(crate) fn write_register(&mut self, register: u8, data: u8) -> Result<(), Error<E>> {
+    pub(crate) fn write_register(
+        &mut self,
+        register: u8,
+        data: u8,
+    ) -> Result<(), Error<I2C::Error>> {
         let payload: [u8; 2] = [register, data];
         self.i2c.write(ADDR, &payload).map_err(Error::I2C)
     }
 
-    pub(crate) fn read_register(&mut self, register: u8) -> Result<u8, Error<E>> {
+    pub(crate) fn read_register(&mut self, register: u8) -> Result<u8, Error<I2C::Error>> {
         let mut data = [0];
         self.i2c
             .write_read(ADDR, &[register], &mut data)

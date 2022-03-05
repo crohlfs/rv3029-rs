@@ -1,14 +1,14 @@
 use crate::{BitFlags, Error, Register, Rv3029, ADDR};
-use embedded_hal::blocking::i2c::{Write, WriteRead};
+use embedded_hal::i2c::blocking::I2c;
 pub use rtcc::{
     DateTimeAccess, Datelike, Hours, NaiveDate, NaiveDateTime, NaiveTime, Rtcc, Timelike,
 };
 
-impl<I2C, E> DateTimeAccess for Rv3029<I2C>
+impl<I2C> DateTimeAccess for Rv3029<I2C>
 where
-    I2C: Write<Error = E> + WriteRead<Error = E>,
+    I2C: I2c,
 {
-    type Error = Error<E>;
+    type Error = Error<I2C::Error>;
 
     fn datetime(&mut self) -> Result<NaiveDateTime, Self::Error> {
         let mut data = [0; 7];
@@ -54,9 +54,9 @@ where
     }
 }
 
-impl<I2C, E> Rtcc for Rv3029<I2C>
+impl<I2C> Rtcc for Rv3029<I2C>
 where
-    I2C: Write<Error = E> + WriteRead<Error = E>,
+    I2C: I2c,
 {
     fn seconds(&mut self) -> Result<u8, Self::Error> {
         let data = self.read_register(Register::SECONDS)?;
@@ -194,11 +194,11 @@ where
     }
 }
 
-impl<I2C, E> Rv3029<I2C>
+impl<I2C> Rv3029<I2C>
 where
-    I2C: Write<Error = E> + WriteRead<Error = E>,
+    I2C: I2c,
 {
-    fn get_hours_from_register(&self, data: u8) -> Result<Hours, Error<E>> {
+    fn get_hours_from_register(&self, data: u8) -> Result<Hours, Error<I2C::Error>> {
         if is_24h_format(data) {
             Ok(Hours::H24(packed_bcd_to_decimal(data & !BitFlags::H24_H12)))
         } else if is_am(data) {
@@ -212,7 +212,7 @@ where
         }
     }
 
-    fn get_hours_register_value(&mut self, hours: Hours) -> Result<u8, Error<E>> {
+    fn get_hours_register_value(&mut self, hours: Hours) -> Result<u8, Error<I2C::Error>> {
         match hours {
             Hours::H24(h) if h > 23 => Err(Error::InvalidInputData),
             Hours::H24(h) => Ok(decimal_to_packed_bcd(h)),
@@ -223,12 +223,16 @@ where
         }
     }
 
-    fn read_register_decimal(&mut self, register: u8) -> Result<u8, Error<E>> {
+    fn read_register_decimal(&mut self, register: u8) -> Result<u8, Error<I2C::Error>> {
         let data = self.read_register(register)?;
         Ok(packed_bcd_to_decimal(data))
     }
 
-    fn write_register_decimal(&mut self, register: u8, decimal_number: u8) -> Result<(), Error<E>> {
+    fn write_register_decimal(
+        &mut self,
+        register: u8,
+        decimal_number: u8,
+    ) -> Result<(), Error<I2C::Error>> {
         self.write_register(register, decimal_to_packed_bcd(decimal_number))
     }
 }

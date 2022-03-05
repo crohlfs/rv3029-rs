@@ -1,11 +1,11 @@
 use crate::{Error, Register, Rv3029, ADDR};
-use embedded_hal::blocking::i2c::{Write, WriteRead};
+use embedded_hal::i2c::blocking::I2c;
 
 const EEPROM_BYTE_COUNT: usize = (Register::EEPROM_END - Register::EEPROM_BEGIN + 1) as usize;
 
-impl<I2C, E> Rv3029<I2C>
+impl<I2C> Rv3029<I2C>
 where
-    I2C: Write<Error = E> + WriteRead<Error = E>,
+    I2C: I2c,
 {
     /// Read a data array from the user EEPROM starting at the given offset.
     ///
@@ -14,7 +14,11 @@ where
     ///
     /// Will return an `Error::InvalidInputData` if attempting to access a position not
     /// available or if attempting to read too much data.
-    pub fn read_eeprom(&mut self, address_offset: u8, data: &mut [u8]) -> Result<(), Error<E>> {
+    pub fn read_eeprom(
+        &mut self,
+        address_offset: u8,
+        data: &mut [u8],
+    ) -> Result<(), Error<I2C::Error>> {
         if data.is_empty() {
             return Ok(());
         }
@@ -35,7 +39,11 @@ where
     ///
     /// Will return an `Error::InvalidInputData` if attempting to access a position not
     /// available or if attempting to write too much data.
-    pub fn write_eeprom(&mut self, address_offset: u8, data: &[u8]) -> Result<(), Error<E>> {
+    pub fn write_eeprom(
+        &mut self,
+        address_offset: u8,
+        data: &[u8],
+    ) -> Result<(), Error<I2C::Error>> {
         if data.is_empty() {
             return Ok(());
         }
@@ -48,7 +56,11 @@ where
             .map_err(Error::I2C)
     }
 
-    fn check_eeprom_parameters(&self, address_offset: u8, data: &[u8]) -> Result<(), Error<E>> {
+    fn check_eeprom_parameters(
+        &self,
+        address_offset: u8,
+        data: &[u8],
+    ) -> Result<(), Error<I2C::Error>> {
         if address_offset >= EEPROM_BYTE_COUNT as u8
             || (address_offset as usize + data.len()) > EEPROM_BYTE_COUNT
         {
