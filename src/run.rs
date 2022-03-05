@@ -1,7 +1,7 @@
-use crate::{BitFlags, Ds1307, Error, Register};
+use crate::{BitFlags, Error, Register, Rv3029};
 use embedded_hal::blocking::i2c::{Write, WriteRead};
 
-impl<I2C, E> Ds1307<I2C>
+impl<I2C, E> Rv3029<I2C>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {

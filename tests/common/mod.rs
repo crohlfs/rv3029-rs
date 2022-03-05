@@ -1,7 +1,7 @@
-extern crate ds1307;
 extern crate embedded_hal_mock as hal;
-use self::ds1307::Ds1307;
+extern crate rv3029;
 use self::hal::i2c::{Mock as I2cMock, Transaction as I2cTrans};
+use self::rv3029::Rv3029;
 
 pub const ADDR: u8 = 0b110_1000;
 
@@ -20,11 +20,11 @@ impl Register {
     pub const RAM_END: u8 = 0x3F;
 }
 
-pub fn new(transactions: &[I2cTrans]) -> Ds1307<I2cMock> {
-    Ds1307::new(I2cMock::new(transactions))
+pub fn new(transactions: &[I2cTrans]) -> Rv3029<I2cMock> {
+    Rv3029::new(I2cMock::new(transactions))
 }
 
-pub fn destroy(dev: Ds1307<I2cMock>) {
+pub fn destroy(dev: Rv3029<I2cMock>) {
     dev.destroy().done();
 }
 

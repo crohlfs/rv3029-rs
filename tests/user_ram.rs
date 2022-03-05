@@ -1,5 +1,5 @@
-use ds1307::Error;
 use embedded_hal_mock::i2c::Transaction as I2cTrans;
+use rv3029::Error;
 mod common;
 use crate::common::{destroy, new, ADDR};
 

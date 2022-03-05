@@ -1,10 +1,10 @@
-use crate::{BitFlags, Ds1307, Error, Register, ADDR};
+use crate::{BitFlags, Error, Register, Rv3029, ADDR};
 use embedded_hal::blocking::i2c::{Write, WriteRead};
 pub use rtcc::{
     DateTimeAccess, Datelike, Hours, NaiveDate, NaiveDateTime, NaiveTime, Rtcc, Timelike,
 };
 
-impl<I2C, E> DateTimeAccess for Ds1307<I2C>
+impl<I2C, E> DateTimeAccess for Rv3029<I2C>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
@@ -13,14 +13,18 @@ where
     fn datetime(&mut self) -> Result<NaiveDateTime, Self::Error> {
         let mut data = [0; 7];
         self.i2c
-            .write_read(ADDR, &[0x00], &mut data)
+            .write_read(ADDR, &[Register::SECONDS], &mut data)
             .map_err(Error::I2C)?;
-        let year = 2000 + u16::from(packed_bcd_to_decimal(data[Register::YEAR as usize]));
-        let month = packed_bcd_to_decimal(data[Register::MONTH as usize]);
-        let day = packed_bcd_to_decimal(data[Register::DOM as usize]);
-        let hour = self.get_hours_from_register(data[Register::HOURS as usize])?;
-        let minute = packed_bcd_to_decimal(data[Register::MINUTES as usize]);
-        let second = packed_bcd_to_decimal(remove_ch_bit(data[Register::SECONDS as usize]));
+        let year = 2000
+            + u16::from(packed_bcd_to_decimal(
+                data[(Register::YEAR - Register::SECONDS) as usize],
+            ));
+        let month = packed_bcd_to_decimal(data[(Register::MONTH - Register::SECONDS) as usize]);
+        let day = packed_bcd_to_decimal(data[(Register::DOM - Register::SECONDS) as usize]);
+        let hour =
+            self.get_hours_from_register(data[(Register::HOURS - Register::SECONDS) as usize])?;
+        let minute = packed_bcd_to_decimal(data[(Register::MINUTES - Register::SECONDS) as usize]);
+        let second = packed_bcd_to_decimal(data[(Register::SECONDS - Register::SECONDS) as usize]);
         Ok(
             NaiveDate::from_ymd(year.into(), month.into(), day.into()).and_hms(
                 get_h24(hour).into(),
@@ -31,7 +35,7 @@ where
     }
 
     fn set_datetime(&mut self, datetime: &NaiveDateTime) -> Result<(), Self::Error> {
-        if datetime.year() < 2000 || datetime.year() > 2099 {
+        if datetime.year() < 2000 || datetime.year() > 2079 {
             return Err(Error::InvalidInputData);
         }
         let hour = self.get_hours_register_value(Hours::H24(datetime.hour() as u8))?;
@@ -50,13 +54,13 @@ where
     }
 }
 
-impl<I2C, E> Rtcc for Ds1307<I2C>
+impl<I2C, E> Rtcc for Rv3029<I2C>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
     fn seconds(&mut self) -> Result<u8, Self::Error> {
         let data = self.read_register(Register::SECONDS)?;
-        Ok(packed_bcd_to_decimal(remove_ch_bit(data)))
+        Ok(packed_bcd_to_decimal(data))
     }
 
     fn minutes(&mut self) -> Result<u8, Self::Error> {
@@ -103,7 +107,7 @@ where
             .map_err(Error::I2C)?;
         let hour = self.get_hours_from_register(data[Register::HOURS as usize])?;
         let minute = packed_bcd_to_decimal(data[Register::MINUTES as usize]);
-        let second = packed_bcd_to_decimal(remove_ch_bit(data[Register::SECONDS as usize]));
+        let second = packed_bcd_to_decimal(data[Register::SECONDS as usize]);
         Ok(NaiveTime::from_hms(
             get_h24(hour).into(),
             minute.into(),
@@ -190,7 +194,7 @@ where
     }
 }
 
-impl<I2C, E> Ds1307<I2C>
+impl<I2C, E> Rv3029<I2C>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
@@ -235,10 +239,6 @@ fn is_24h_format(hours_data: u8) -> bool {
 
 fn is_am(hours_data: u8) -> bool {
     hours_data & BitFlags::AM_PM == 0
-}
-
-fn remove_ch_bit(value: u8) -> u8 {
-    value & !BitFlags::CH
 }
 
 /// Transforms a number in packed BCD format to decimal

@@ -1,4 +1,4 @@
-//! This is a platform agnostic Rust driver for the DS1307 real-time clock,
+//! This is a platform agnostic Rust driver for the RV-3029-C2 real-time clock,
 //! based on the [`embedded-hal`](https://github.com/japaric/embedded-hal) traits.
 //!
 //! This driver allows you to:
@@ -7,10 +7,10 @@
 //! - Read and write user RAM. See: [`read_ram()`].
 //! - Control square-wave output. See: [`enable_square_wave_output()`].
 //!
-//! [`datetime()`]: Ds1307::datetime
-//! [`set_running()`]: Ds1307::set_running
-//! [`read_ram()`]: Ds1307::read_ram
-//! [`enable_square_wave_output()`]: Ds1307::enable_square_wave_output
+//! [`datetime()`]: Rv3029::datetime
+//! [`set_running()`]: Rv3029::set_running
+//! [`read_ram()`]: Rv3029::read_ram
+//! [`enable_square_wave_output()`]: Rv3029::enable_square_wave_output
 //!
 //! ## The device
 //!
@@ -43,10 +43,10 @@
 //!
 //! ```no_run
 //! use linux_embedded_hal as hal;
-//! use ds1307::{Ds1307, NaiveDate, DateTimeAccess};
+//! use rv3029::{Rv3029, NaiveDate, DateTimeAccess};
 //!
 //! let dev = hal::I2cdev::new("/dev/i2c-1").unwrap();
-//! let mut rtc = Ds1307::new(dev);
+//! let mut rtc = Rv3029::new(dev);
 //! let datetime = NaiveDate::from_ymd(2020, 5, 2).and_hms(19, 59, 58);
 //! rtc.set_datetime(&datetime).unwrap();
 //! // ...
@@ -65,10 +65,10 @@
 //!
 //! ```no_run
 //! use linux_embedded_hal as hal;
-//! use ds1307::{Ds1307, Rtcc};
+//! use rv3029::{Rv3029, Rtcc};
 //!
 //! let dev = hal::I2cdev::new("/dev/i2c-1").unwrap();
-//! let mut rtc = Ds1307::new(dev);
+//! let mut rtc = Rv3029::new(dev);
 //! let year = rtc.year().unwrap();
 //! println!("Year: {}", year);
 //! ```
@@ -83,10 +83,10 @@
 //!
 //! ```no_run
 //! use linux_embedded_hal as hal;
-//! use ds1307::{Ds1307, Rtcc};
+//! use rv3029::{Rv3029, Rtcc};
 //!
 //! let dev = hal::I2cdev::new("/dev/i2c-1").unwrap();
-//! let mut rtc = Ds1307::new(dev);
+//! let mut rtc = Rv3029::new(dev);
 //! rtc.set_year(2018).unwrap();
 //! ```
 //!
@@ -97,10 +97,10 @@
 //!
 //! ```no_run
 //! use linux_embedded_hal as hal;
-//! use ds1307::{Ds1307, Rtcc};
+//! use rv3029::{Rv3029, Rtcc};
 //!
 //! let dev = hal::I2cdev::new("/dev/i2c-1").unwrap();
-//! let mut rtc = Ds1307::new(dev);
+//! let mut rtc = Rv3029::new(dev);
 //! let date = rtc.date().unwrap();
 //! println!("{}", date);
 //! ```
@@ -109,10 +109,10 @@
 //!
 //! ```no_run
 //! use linux_embedded_hal as hal;
-//! use ds1307::Ds1307;
+//! use rv3029::Rv3029;
 //!
 //! let dev = hal::I2cdev::new("/dev/i2c-1").unwrap();
-//! let mut rtc = Ds1307::new(dev);
+//! let mut rtc = Rv3029::new(dev);
 //!
 //! let data = [171; 3];
 //! rtc.write_ram(2, &data).unwrap();
@@ -128,10 +128,10 @@
 //!
 //! ```no_run
 //! use linux_embedded_hal as hal;
-//! use ds1307::{Ds1307, SqwOutRate};
+//! use rv3029::{Rv3029, SqwOutRate};
 //!
 //! let dev = hal::I2cdev::new("/dev/i2c-1").unwrap();
-//! let mut rtc = Ds1307::new(dev);
+//! let mut rtc = Rv3029::new(dev);
 //!
 //! rtc.enable_square_wave_output().unwrap();
 //! let rate = SqwOutRate::Khz32_768;
@@ -153,9 +153,9 @@ pub enum Error<E> {
     InvalidInputData,
 }
 
-/// DS1307 driver
+/// RV-3029-C2 driver
 #[derive(Debug, Default)]
-pub struct Ds1307<I2C> {
+pub struct Rv3029<I2C> {
     /// The concrete I²C device implementation.
     i2c: I2C,
 }
@@ -164,20 +164,21 @@ mod datetime;
 pub use rtcc::{
     DateTimeAccess, Datelike, Hours, NaiveDate, NaiveDateTime, NaiveTime, Rtcc, Timelike,
 };
+mod eeprom;
 mod ram;
 mod run;
-mod square_wave;
-pub use crate::square_wave::{SqwOutLevel, SqwOutRate};
+// mod square_wave;
+// pub use crate::square_wave::{SqwOutLevel, SqwOutRate};
 mod register_access;
 use crate::register_access::{BitFlags, Register, ADDR};
 
-impl<I2C, E> Ds1307<I2C>
+impl<I2C, E> Rv3029<I2C>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
     /// Create a new instance.
     pub fn new(i2c: I2C) -> Self {
-        Ds1307 { i2c }
+        Rv3029 { i2c }
     }
 
     /// Destroy driver instance, return I²C bus instance.

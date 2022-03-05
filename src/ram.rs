@@ -1,9 +1,9 @@
-use crate::{Ds1307, Error, Register, ADDR};
+use crate::{Error, Register, Rv3029, ADDR};
 use embedded_hal::blocking::i2c::{Write, WriteRead};
 
 const RAM_BYTE_COUNT: usize = (Register::RAM_END - Register::RAM_BEGIN + 1) as usize;
 
-impl<I2C, E> Ds1307<I2C>
+impl<I2C, E> Rv3029<I2C>
 where
     I2C: Write<Error = E> + WriteRead<Error = E>,
 {
