@@ -1,5 +1,5 @@
 [package]
-authors = ["Chris Rohlfs <chrisrohlfs@outlook.com>"]
+authors = ["Diego Barrios Romero <eldruin@gmail.com>", "Chris Rohlfs <chrisrohlfs@outlook.com>"]
 categories = ["embedded", "hardware-support", "no-std"]
 description = "Platform-agnostic Rust driver for the RV3029 real-time clock."
 documentation = "https://docs.rs/rv3029"
