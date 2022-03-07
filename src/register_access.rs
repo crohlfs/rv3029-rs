@@ -21,7 +21,6 @@ pub struct BitFlags;
 impl BitFlags {
     pub const H24_H12: u8 = 0b0100_0000;
     pub const AM_PM: u8 = 0b0010_0000;
-    pub const CH: u8 = 0b1000_0000;
     // pub const SQWE: u8 = 0b0001_0000;
     // pub const OUTLEVEL: u8 = 0b1000_0000;
     // pub const OUTRATERS0: u8 = 0b0000_0001;

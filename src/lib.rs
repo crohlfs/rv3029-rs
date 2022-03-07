@@ -166,7 +166,6 @@ pub use rtcc::{
 };
 mod eeprom;
 mod ram;
-mod run;
 // mod square_wave;
 // pub use crate::square_wave::{SqwOutLevel, SqwOutRate};
 mod register_access;
