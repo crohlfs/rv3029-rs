@@ -1,5 +1,5 @@
 use crate::{Error, Register, Rv3029, ADDR};
-use embedded_hal::i2c::blocking::I2c;
+use embedded_hal::i2c::I2c;
 
 const RAM_BYTE_COUNT: usize = (Register::RAM_END - Register::RAM_BEGIN + 1) as usize;
 

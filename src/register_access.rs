@@ -1,5 +1,5 @@
 use crate::{Error, Rv3029};
-use embedded_hal::i2c::blocking::I2c;
+use embedded_hal::i2c::I2c;
 
 pub struct Register;
 impl Register {
@@ -27,46 +27,46 @@ impl BitFlags {
     // pub const OUTRATERS1: u8 = 0b0000_0010;
 }
 
-pub const ADDR: u8 = 0xac;
+pub const ADDR: u8 = 0x56;
 
 impl<I2C> Rv3029<I2C>
 where
     I2C: I2c,
 {
-    pub(crate) fn register_bit_flag_high(
-        &mut self,
-        address: u8,
-        bitmask: u8,
-    ) -> Result<bool, Error<I2C::Error>> {
-        let data = self.read_register(address)?;
-        Ok((data & bitmask) != 0)
-    }
+    // pub(crate) fn register_bit_flag_high(
+    //     &mut self,
+    //     address: u8,
+    //     bitmask: u8,
+    // ) -> Result<bool, Error<I2C::Error>> {
+    //     let data = self.read_register(address)?;
+    //     Ok((data & bitmask) != 0)
+    // }
 
-    pub(crate) fn set_register_bit_flag(
-        &mut self,
-        address: u8,
-        bitmask: u8,
-    ) -> Result<(), Error<I2C::Error>> {
-        let data = self.read_register(address)?;
-        if (data & bitmask) == 0 {
-            self.write_register(address, data | bitmask)
-        } else {
-            Ok(())
-        }
-    }
+    // pub(crate) fn set_register_bit_flag(
+    //     &mut self,
+    //     address: u8,
+    //     bitmask: u8,
+    // ) -> Result<(), Error<I2C::Error>> {
+    //     let data = self.read_register(address)?;
+    //     if (data & bitmask) == 0 {
+    //         self.write_register(address, data | bitmask)
+    //     } else {
+    //         Ok(())
+    //     }
+    // }
 
-    pub(crate) fn clear_register_bit_flag(
-        &mut self,
-        address: u8,
-        bitmask: u8,
-    ) -> Result<(), Error<I2C::Error>> {
-        let data = self.read_register(address)?;
-        if (data & bitmask) != 0 {
-            self.write_register(address, data & !bitmask)
-        } else {
-            Ok(())
-        }
-    }
+    // pub(crate) fn clear_register_bit_flag(
+    //     &mut self,
+    //     address: u8,
+    //     bitmask: u8,
+    // ) -> Result<(), Error<I2C::Error>> {
+    //     let data = self.read_register(address)?;
+    //     if (data & bitmask) != 0 {
+    //         self.write_register(address, data & !bitmask)
+    //     } else {
+    //         Ok(())
+    //     }
+    // }
 
     pub(crate) fn write_register(
         &mut self,

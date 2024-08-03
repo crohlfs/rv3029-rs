@@ -1,5 +1,5 @@
 use crate::{BitFlags, Error, Register, Rv3029};
-use embedded_hal::blocking::i2c::{Write, WriteRead};
+use embedded_hal::i2c::{Write, WriteRead};
 
 /// Square-wave output rate
 #[derive(Debug, Clone, Copy, PartialEq)]

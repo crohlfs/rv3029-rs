@@ -1,5 +1,5 @@
 use embedded_hal_mock::i2c::Transaction as I2cTrans;
-use rv3029::{DateTimeAccess, Error, NaiveDate, NaiveDateTime, NaiveTime, Rtcc};
+use rv3029::{DateTimeAccess, Error, NaiveDate, NaiveDateTime, NaiveTime};
 mod common;
 use crate::common::{destroy, new, Register, ADDR};
 

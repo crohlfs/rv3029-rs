@@ -140,9 +140,9 @@
 
 #![deny(unsafe_code)]
 #![deny(missing_docs)]
-#![no_std]
+// #![feature(async_fn_in_trait)]
 
-use embedded_hal::i2c::blocking::I2c;
+use embedded_hal::i2c::I2c;
 
 /// All possible errors in this crate
 #[derive(Debug)]
@@ -161,9 +161,8 @@ pub struct Rv3029<I2C> {
 }
 
 mod datetime;
-pub use rtcc::{
-    DateTimeAccess, Datelike, Hours, NaiveDate, NaiveDateTime, NaiveTime, Rtcc, Timelike,
-};
+pub use chrono::{Datelike, NaiveDate, NaiveDateTime, NaiveTime, Timelike};
+pub use datetime::Hours;
 mod eeprom;
 mod ram;
 // mod square_wave;

@@ -3,7 +3,7 @@ authors = ["Diego Barrios Romero <eldruin@gmail.com>", "Chris Rohlfs <chrisrohlf
 categories = ["embedded", "hardware-support", "no-std"]
 description = "Platform-agnostic Rust driver for the RV3029 real-time clock."
 documentation = "https://docs.rs/rv3029"
-edition = "2018"
+edition = "2021"
 homepage = "https://github.com/crohlfs/rv3029-rs"
 include = [
   "/**/*.rs",
@@ -21,8 +21,8 @@ repository = "https://github.com/crohlfs/rv3029-rs"
 version = "0.1.0"
 
 [dependencies]
-embedded-hal = "1.0.0-alpha.7"
-rtcc = "0.3"
+chrono = "0.4"
+embedded-hal = "=1.0.0"
 
 [dev-dependencies]
 embedded-hal-mock = "0.8"

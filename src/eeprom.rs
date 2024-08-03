@@ -1,5 +1,5 @@
 use crate::{Error, Register, Rv3029, ADDR};
-use embedded_hal::i2c::blocking::I2c;
+use embedded_hal::i2c::I2c;
 
 const EEPROM_BYTE_COUNT: usize = (Register::EEPROM_END - Register::EEPROM_BEGIN + 1) as usize;
 
